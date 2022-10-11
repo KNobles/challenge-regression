@@ -1,8 +1,11 @@
-from typing import Any
+import seaborn as sns
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv("../challenge-collecting-data/data/Property_structured_data.csv")
+df = pd.read_csv("Property_structured_data.csv")
+
+others = ["CHALET", "MANOR_HOUSE", "OTHER_PROPERTY", "CASTLE", "PAVILION"]
 
 columns = ['postal_code', 'type_of_property', 'subtype_of_property', 'type_of_sale', 'price',
        'number_of_bedrooms', 'surface', 'kitchen_type',
@@ -10,15 +13,16 @@ columns = ['postal_code', 'type_of_property', 'subtype_of_property', 'type_of_sa
        'terrace_surface', 'garden', 'garden_surface', 'land_surface',
        'number_of_facades', 'swimming_pool', 'state_of_the_building']
 
-def replace_to_nan(data: pd.DataFrame, column_name:str, value: Any):
+def replace_to_nan(data: pd.DataFrame, column_name:str, value):
     data.loc[data[column_name] == value, column_name] = np.nan
 
 replace_to_nan(df, "price", -1)
 replace_to_nan(df, "surface", -1)
 replace_to_nan(df, "number_of_bedrooms", -1)
 
+df.loc[df["price"] >= 800000, "type_of_property"] = "OTHER"
 df.loc[df["number_of_facades"] > 8, "number_of_facades"] = np.nan
-
+df.loc[df["subtype_of_property"].isin(others), "type_of_property"] = "OTHER"
 df["number_of_facades"] = np.where((df["number_of_facades"] == -1) & (df["type_of_property"] == "APARTMENT"), 1, df["number_of_facades"])
 df["number_of_facades"] = np.where((df["number_of_facades"] == -1) & (df["type_of_property"] == "HOUSE"), 2, df["number_of_facades"])
 
@@ -32,10 +36,11 @@ df.dropna(subset=["number_of_facades"], inplace=True)
 
 df[df["type_of_property"].str.contains("APARTMENT_GROUP")==False]
 df[df["type_of_property"].str.contains("HOUSE_GROUP")==False]
+df[df["subtype_of_property"].str.contains("KOT")==False]
 df[df["type_of_sale"].str.contains("first_session_with_reserve_price")==True]
 df[df["type_of_sale"].str.contains("residential_sale")==True]
 df.drop_duplicates()
 
-print(df["type_of_sale"].value_counts())
+print(df["type_of_property"].value_counts())
 
-
+df.to_csv("cleaned_data.csv", index=False)
