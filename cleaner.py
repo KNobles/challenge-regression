@@ -20,9 +20,15 @@ replace_to_nan(df, "price", -1)
 replace_to_nan(df, "surface", -1)
 replace_to_nan(df, "number_of_bedrooms", -1)
 
+df.drop_duplicates()
+
+df.loc[df["swimming_pool"] == -1, "swimming_pool"] = 0
 df.loc[df["price"] >= 800000, "type_of_property"] = "OTHER"
 df.loc[df["number_of_facades"] > 8, "number_of_facades"] = np.nan
 df.loc[df["subtype_of_property"].isin(others), "type_of_property"] = "OTHER"
+
+df.loc[(df["garden"] == 1) & (df["land_surface"] == -1), "land_surface"] = 
+
 df["number_of_facades"] = np.where((df["number_of_facades"] == -1) & (df["type_of_property"] == "APARTMENT"), 1, df["number_of_facades"])
 df["number_of_facades"] = np.where((df["number_of_facades"] == -1) & (df["type_of_property"] == "HOUSE"), 2, df["number_of_facades"])
 
@@ -39,8 +45,7 @@ df[df["type_of_property"].str.contains("HOUSE_GROUP")==False]
 df[df["subtype_of_property"].str.contains("KOT")==False]
 df[df["type_of_sale"].str.contains("first_session_with_reserve_price")==True]
 df[df["type_of_sale"].str.contains("residential_sale")==True]
-df.drop_duplicates()
 
-print(df["type_of_property"].value_counts())
+print(df["land_surface"].value_counts())
 
 df.to_csv("cleaned_data.csv", index=False)
