@@ -27,8 +27,6 @@ df.loc[df["price"] >= 800000, "type_of_property"] = "OTHER"
 df.loc[df["number_of_facades"] > 8, "number_of_facades"] = np.nan
 df.loc[df["subtype_of_property"].isin(others), "type_of_property"] = "OTHER"
 
-df.loc[(df["garden"] == 1) & (df["land_surface"] == -1), "land_surface"] = 
-
 df["number_of_facades"] = np.where((df["number_of_facades"] == -1) & (df["type_of_property"] == "APARTMENT"), 1, df["number_of_facades"])
 df["number_of_facades"] = np.where((df["number_of_facades"] == -1) & (df["type_of_property"] == "HOUSE"), 2, df["number_of_facades"])
 
